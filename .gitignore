@@ -1,0 +1,13 @@
+# The Database (Never upload your users' data!)
+instance/
+*.db
+
+# Python Junk (Compilations)
+__pycache__/
+*.pyc
+
+# Editor Settings
+.vscode/
+
+# Environment Variables (Secrets)
+.env

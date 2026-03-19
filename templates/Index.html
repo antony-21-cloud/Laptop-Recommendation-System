@@ -1,0 +1,34 @@
+
+<!doctype html>
+    <html>
+        <head>
+            <style>
+                body {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    margin: 0;
+                    background-color: rgb(139, 105, 231);
+                }
+                .login-box {
+                    background-color: rgb(139, 105, 231);
+                    padding: 20px;
+                    
+                }
+            </style>
+            <title>login page</title>
+    </head>
+    <body style="background-color:rgb(139, 105, 231);">
+        <div class="login-box"></div>
+        <h1>Login</h1>
+        <form action="/login" method="post">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username"><br><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password"><br><br>
+            <input type="submit" value="Login">
+        </form>
+
+    </body></html>
+</doctype>

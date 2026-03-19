@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+</head>
+<body>
+    <h1>Student Dashboard</h1>
+    <p><h1>Welcome, {{ current_user.username }}</h1></p>
+
+<form action="/search" method="POST"></form>
+
+    <label for="course">Select Course:</label>
+    <select id="course" name="course">
+        {% for course in courses %}
+            <option value="{{ course.id }}">{{ course.name }}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+
+    <label for="laptop_name">Search Laptop:</label>
+    <input type="text" name="laptop_name" placeholder="Search Brand (e.g., HP, Dell)">
+    <label for="min_budget">Minimum Budget:</label>
+    <input type="number" name="min_budget" placeholder="Minimum Budget (KES)">
+    <label for="max_budget">Maximum Budget:</label>
+    <input type="number" name="max_budget" placeholder="Maximum Budget (KES)">
+    <input type="submit" value="reccommend">
+
+    
+</form>
+
+</body>
+</html>
