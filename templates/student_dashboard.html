@@ -1,34 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard</title>
-</head>
-<body>
-    <h1>Student Dashboard</h1>
-    <p><h1>Welcome, {{ current_user.username }}</h1></p>
+{% extends 'base.html' %}
 
-<form action="/search" method="POST"></form>
+{% block content %}
+<div class="min-h-screen bg-slate-950 text-slate-100 p-6 font-mono">
+    <div class="border-b border-slate-800 pb-4 mb-8">
+        <h1 class="text-2xl font-bold text-emerald-400 tracking-tighter">TERMINAL://STUDENT_SEARCH</h1>
+        <p class="text-xs text-slate-500">Querying Available High-Performance Hardware...</p>
+    </div>
 
-    <label for="course">Select Course:</label>
-    <select id="course" name="course">
-        {% for course in courses %}
-            <option value="{{ course.id }}">{{ course.name }}</option>
-        {% endfor %}
-    </select>
-    <br><br>
+    <div class="bg-slate-900 border border-slate-800 p-4 rounded-lg mb-8 flex flex-wrap gap-4 items-end">
+        <div class="flex-1 min-w-[200px]">
+            <label class="block text-[10px] text-slate-500 mb-1 uppercase">Processor_Type</label>
+            <select id="filter-processor" class="w-full bg-slate-950 border border-slate-800 p-2 text-emerald-400 outline-none focus:border-emerald-500">
+                <option value="">ALL_CPUs</option>
+                <option value="Ryzen 7">Ryzen 7</option>
+                <option value="Core i7">Core i7</option>
+                <option value="Apple M2">Apple M2</option>
+            </select>
+        </div>
+        <div class="flex-1 min-w-[200px]">
+            <label class="block text-[10px] text-slate-500 mb-1 uppercase">Budget_Cap (Ksh)</label>
+            <input type="number" id="filter-price" placeholder="Max Price" class="w-full bg-slate-950 border border-slate-800 p-2 text-emerald-400 outline-none focus:border-emerald-500">
+        </div>
+        <button onclick="searchLaptops()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded font-bold text-xs uppercase transition-all">
+            EXECUTE_QUERY
+        </button>
+    </div>
 
-    <label for="laptop_name">Search Laptop:</label>
-    <input type="text" name="laptop_name" placeholder="Search Brand (e.g., HP, Dell)">
-    <label for="min_budget">Minimum Budget:</label>
-    <input type="number" name="min_budget" placeholder="Minimum Budget (KES)">
-    <label for="max_budget">Maximum Budget:</label>
-    <input type="number" name="max_budget" placeholder="Maximum Budget (KES)">
-    <input type="submit" value="reccommend">
-
-    
-</form>
-
-</body>
-</html>
+    <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        </div>
+</div>
+{% endblock %}

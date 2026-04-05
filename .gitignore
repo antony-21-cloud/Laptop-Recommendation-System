@@ -6,8 +6,13 @@ instance/
 __pycache__/
 *.pyc
 
+static/uploads/
+.DS_Store
+
 # Editor Settings
 .vscode/
 
 # Environment Variables (Secrets)
 .env
+
+

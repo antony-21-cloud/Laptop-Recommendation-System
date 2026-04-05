@@ -1,16 +1,48 @@
-from flask import Flask, render_template, redirect, url_for, request, flash
-from flask_admin import Admin
+import os
+from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
+from flask_admin import Admin, AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView 
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from models import db, User, Laptop, Course 
+from models import db, User, Laptop, Course, SupportTicket, PurchaseRequest
+
+# --- 1. ADMIN SECURITY & DYNAMIC DASHBOARD ---
+class MyAdminView(ModelView):
+    def is_authenticated(self):
+        return current_user.is_authenticated and current_user.username == 'Aristo'
+    
+    def is_accessible(self):
+        return self.is_authenticated()
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('login'))
+
+# In app.py
+class MyAdminHomeView(AdminIndexView):
+    @expose('/')
+    def index(self):
+        user_count = User.query.count()
+        laptop_count = Laptop.query.count()
+        all_users = User.query.all()
+        return self.render('admin/index.html', # Ensure this file exists in templates/admin/
+                           user_count=user_count, 
+                           laptop_count=laptop_count,
+                           users=all_users)
+
+# --- 2. APP CONFIGURATION ---
+import os
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+# This forces the DB to stay in the root project folder
+db_path = os.path.join(basedir, 'laptop_rec.db')
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///laptop_rec.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'knec_project_2026'
+app.config['UPLOAD_FOLDER'] = os.path.join(basedir, 'static/uploads')
 
 db.init_app(app)
 
-# --- NEW: Login Manager Setup (Mandatory) ---
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -18,60 +50,112 @@ login_manager.login_view = 'login'
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-# --------------------------------------------
 
-admin = Admin(app, name='Laptop System Admin')
-admin.add_view(ModelView(Course, db.session))
-admin.add_view(ModelView(User, db.session))
-admin.add_view(ModelView(Laptop, db.session))
+# Admin Panel Setup - Using the Custom Home View
+admin = Admin(app, name='Laptop System Admin', index_view=MyAdminHomeView(url='/admin'))
+admin.add_view(MyAdminView(Course, db.session))
+admin.add_view(MyAdminView(User, db.session))
+admin.add_view(MyAdminView(Laptop, db.session))
+admin.add_view(MyAdminView(SupportTicket, db.session))
+
+# --- 3. THE "DECOUPLED" API ROUTES (JSON ONLY) ---
+
+@app.route('/api/auth/status')
+def auth_status():
+    if current_user.is_authenticated:
+        return jsonify({
+            "is_logged_in": True,
+            "username": current_user.username,
+            "role": current_user.role
+        })
+    return jsonify({"is_logged_in": False}), 401
+
+@app.route('/api/seller/laptops')
+@login_required
+def get_seller_laptops():
+    if current_user.role != 'seller':
+        return jsonify({"error": "Unauthorized"}), 403
+    laptops = Laptop.query.filter_by(seller_id=current_user.id).all()
+    return jsonify([l.to_dict() for l in laptops])
+
+@app.route('/api/seller/add_laptop', methods=['POST'])
+@login_required
+def add_laptop_api():
+    data = request.get_json()
+    new_laptop = Laptop(
+        name=data.get('name'), 
+        processor=data.get('processor'), 
+        price=float(data.get('price')), 
+        seller_id=current_user.id
+    )
+    db.session.add(new_laptop)
+    db.session.commit()
+    return jsonify({"message": "Hardware Unit Logged Successfully!"}), 201
+
+@app.route('/api/student/search')
+def student_search():
+    processor = request.args.get('processor')
+    max_price = request.args.get('price')
+    query = Laptop.query
+    if processor:
+        query = query.filter(Laptop.processor.contains(processor))
+    if max_price:
+        query = query.filter(Laptop.price <= float(max_price))
+    return jsonify([l.to_dict() for l in query.all()])
+
+# --- 4. NAVIGATION ROUTES ---
 
 @app.route('/')
 def index():
-    courses = Course.query.all()
-    return render_template('index.html', courses=courses)
+    return render_template('index.html', courses=Course.query.all())
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        # FIX: Use Capital 'User'
+        data = request.get_json() if request.is_json else request.form
+        username = data.get('username')
+        password = data.get('password')
+        
         user = User.query.filter_by(username=username).first()
         if user and user.password == password:
             login_user(user)
-            # Redirect based on role
-            if user.role == 'student':
-                return redirect(url_for('student_dashboard'))
-            else:
-                return redirect(url_for('index')) # Or seller dashboard
+            role_url = url_for('admin.index') if user.username == 'Aristo' else \
+                       url_for('seller_dashboard') if user.role == 'seller' else \
+                       url_for('student_dashboard')
+            
+            if request.is_json:
+                return jsonify({"success": True, "role": user.role, "url": role_url})
+            return redirect(role_url)
+        
+        if request.is_json:
+            return jsonify({"success": False, "message": "Invalid Credentials"}), 401
+        flash("Invalid credentials!")
+            
     return render_template('login.html')
+
+@app.route('/seller_dashboard')
+@login_required
+def seller_dashboard():
+    if current_user.role != 'seller':
+        return redirect(url_for('index'))
+    return render_template('seller_dashboard.html')
 
 @app.route('/student_dashboard')
 @login_required
 def student_dashboard():
     if current_user.role != 'student':
-        flash("Access Denied!")
         return redirect(url_for('index'))
-    all_courses = Course.query.all()
-    return render_template('student_dashboard.html', courses=all_courses, laptops=[])
+    return render_template('student_dashboard.html', courses=Course.query.all())
 
-@app.route('/search', methods=['POST'])
+@app.route('/logout')
 @login_required
-def search():
-    budget = request.form.get('max_budget')
-    course_id = request.form.get('course_id')
-    selected_course = Course.query.get(course_id)
-    
-    # Expert Logic: Filter by budget AND course requirements
-    results = Laptop.query.filter(
-        Laptop.price <= budget,
-        Laptop.ram >= selected_course.min_ram
-    ).all()
-    
-    return render_template('student_dashboard.html', 
-                           laptops=results, 
-                           courses=Course.query.all())
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
-# FIX: This must be at the VERY BOTTOM
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
 if __name__ == '__main__':
     app.run(debug=True)

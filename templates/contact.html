@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 500px; margin: 50px auto; background: #222; padding: 30px; border-radius: 10px; color: white;">
+    <h2>Report a Problem to Aristo</h2>
+    <form method="POST">
+        <label>Describe your issue:</label><br>
+        <textarea name="message" style="width: 100%; height: 100px; margin-top: 10px;"></textarea><br><br>
+        <button type="submit" style="background: #5cb85c; color: white; border: none; padding: 10px 20px; cursor: pointer;">Send Report</button>
+    </form>
+</div>
+{% endblock %}

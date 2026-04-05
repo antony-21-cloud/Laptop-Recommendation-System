@@ -15,6 +15,12 @@
         <input type="submit" value="Login">
     </form>
 
+<div class="space-y-4">
+    <input type="text" id="login-user" placeholder="USERNAME" class="w-full bg-slate-950 border border-slate-800 p-3 text-cyan-400">
+    <input type="password" id="login-pass" placeholder="PASSWORD" class="w-full bg-slate-950 border border-slate-800 p-3 text-cyan-400">
+    <button onclick="executeLogin()" class="w-full bg-cyan-600 p-3 font-bold uppercase text-xs">Authorize_Access</button>
+</div>
+
 <style>
     body {
         background-image: url("{{ url_for('static', filename='images/login.jpg') }}");

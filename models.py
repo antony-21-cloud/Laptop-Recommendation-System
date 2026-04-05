@@ -1,41 +1,69 @@
+from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Integer, ForeignKey, Float
 
 db = SQLAlchemy()
 
-# 1. THE USER MODEL (The Security Guard)
 class User(db.Model, UserMixin):
-    __tablename__ = "users"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
-    password: Mapped[str] = mapped_column(String(100), nullable=False)
-    role: Mapped[str] = mapped_column(String(20), default='student') # student, seller, admin
+    __tablename__ = 'user' # We go back to singular to match your error
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(150), unique=True, nullable=False)
+    email = db.Column(db.String(150), unique=True, nullable=False)
+    password = db.Column(db.String(150), nullable=False)
+    role = db.Column(db.String(50), default='student')
     
-    # Specific for Students
-    course_id: Mapped[int] = mapped_column(ForeignKey("courses.id"), nullable=True)
-    
-    # Relationship: A Seller (User) owns many laptops
-    laptops = relationship("Laptop", back_populates="seller")
+    # Profile fields
+    shop_name = db.Column(db.String(150), default="My Laptop Shop")
+    phone_number = db.Column(db.String(20), default="+254 700 000 000")
+    address = db.Column(db.String(250), default="Nairobi, Kenya")
+    bio = db.Column(db.Text, default="Professional laptop seller.")
+    member_since = db.Column(db.DateTime, default=datetime.utcnow)
 
-# 2. THE COURSE MODEL (The Expert Rules)
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "role": self.role
+        }
+
 class Course(db.Model):
     __tablename__ = "courses"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(100), nullable=False)
-    min_ram: Mapped[int] = mapped_column(Integer)
-    min_cpu_score: Mapped[int] = mapped_column(Integer)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    min_ram = db.Column(db.Integer)
+    min_cpu_score = db.Column(db.Integer)
 
-# 3. THE LAPTOP MODEL (The Warehouse Item)
 class Laptop(db.Model):
-    __tablename__ = "laptops"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(100), nullable=False)
-    ram: Mapped[int] = mapped_column(Integer)
-    cpu_score: Mapped[int] = mapped_column(Integer)
-    price: Mapped[int] = mapped_column(Integer)
+    __tablename__ = 'laptops'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    processor = db.Column(db.String(100))
+    price = db.Column(db.Float, nullable=False)
     
-    # The Handshake: Links Laptop to a Seller (User)
-    seller_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    seller = relationship("User", back_populates="laptops")
+    # We point strictly to 'user.id'
+    seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # Explicitly tell SQLAlchemy how to join
+    seller = db.relationship('User', backref='laptops', foreign_keys=[seller_id])
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "price": self.price
+        }
+
+class SupportTicket(db.Model):
+    __tablename__ = "support_tickets"
+    id = db.Column(db.Integer, primary_key=True)
+    user_name = db.Column(db.String(100))
+    message = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(20), default="Pending")
+
+class PurchaseRequest(db.Model):
+    __tablename__ = 'purchase_requests'
+    id = db.Column(db.Integer, primary_key=True)
+    laptop_id = db.Column(db.Integer, db.ForeignKey('laptops.id'), nullable=False)
+    buyer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    status = db.Column(db.String(20), default='Pending')
