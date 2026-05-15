@@ -1,40 +1,240 @@
 <!DOCTYPE html>
-<html lang ="en">
-    <head>
-        <style>
-            body {
-                display:flex;
-                justify-content:center;
-                align-items:center;
-                height:100vh;
-                margin:0;
-                background-color:rgb(139, 105, 231);
+<html lang="en">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join LaptopIQ - Register</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+        .hero {
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(15,15,15,0.85), rgba(15,15,15,0.85)), url('https://i.pinimg.com/1200x/f5/ce/07/f5ce078e5112d477ba9edfbcc53d7870.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 2rem;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+        .hero p {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            max-width: 550px;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+        .register-form {
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            max-width: 450px;
+            width: 100%;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #94a3b8;
+            letter-spacing: 0.5px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            background: rgba(0,0,0,0.4);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .form-group input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+        .form-group select option {
+            background: #1e293b;
+            color: white;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #22d3ee;
+            background: rgba(0,0,0,0.6);
+            box-shadow: 0 0 0 3px rgba(34,211,238,0.2);
+        }
+        .reg-btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 100%);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+        .reg-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(34,211,238,0.3);
+        }
+        .login-link {
+            margin-top: 1.5rem;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+        }
+        .login-link a {
+            color: #22d3ee;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        .role-hint {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+        @media (max-width: 768px) {
+            .hero {
+                padding: 1rem;
             }
-            .register-box {
-                background-color: rgb(139, 105, 231);
+            .register-form {
+                padding: 1.5rem;
             }
-        </style>
-    </head>
-    <body style ="background-color:rgb(139, 105, 231);">
-        <div class="register-box"></div>
-        <form>
-        <h1>Register</h1>
-        <form action="/register" method="post">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username"><br><br>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password"><br><br>
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <h1>LAPTOP<span class="text-cyan-400">IQ</span></h1>
+        <p>Join thousands of buyers and sellers. Create your account in seconds and start exploring premium laptops.</p>
+        
+        <div class="register-form">
+            <form id="regForm" method="POST" action="/register">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Username</label>
+                    <input type="text" id="reg_username" name="username" placeholder="Choose a username" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="reg_password" name="password" placeholder="Create a password" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user-tag"></i> I want to...</label>
+                    <select id="reg_role" name="role" required>
+                        <option value="" disabled selected>Select your role</option>
+                        <option value="student">💻 Buy a Laptop (Student)</option>
+                        <option value="seller">📦 Sell Laptops (Seller)</option>
+                    </select>
+                    <div class="role-hint">
+                        <i class="fas fa-info-circle"></i> Students can browse and request laptops. Sellers can list and sell.
+                    </div>
+                </div>
+                <button type="submit" class="reg-btn">
+                    <i class="fas fa-rocket"></i> CREATE ACCOUNT
+                </button>
+            </form>
+            
+            <p class="login-link">
+                Already have an account? <a href="/login">Login here</a>
+            </p>
+        </div>
+    </section>
 
-            <p>Are you a student or a seller?</p>
-            <input type =radio id="i am a student" name="role" value="student">
-            <label for ="i am a student">I am a student</label><br>
-            <input type =radio  id="i am a seller" name="role" value="seller">
-            <label for ="i am a seller">I am a seller</label><br>
-
-            <input type="submit" value="Register">
-
-                    <p>already have an account? <a href="/login">Login</a> </p>
-
-        </form>
-    </body>
+    <script>
+        document.getElementById('regForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('reg_username').value.trim();
+            const password = document.getElementById('reg_password').value;
+            const role = document.getElementById('reg_role').value;
+            
+            // Validation
+            if (!username || !password || !role) {
+                alert('Please fill in all fields and select a role.');
+                return;
+            }
+            
+            if (password.length < 4) {
+                alert('Password must be at least 4 characters long.');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = document.querySelector('.reg-btn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        username: username,
+                        password: password,
+                        role: role
+                    })
+                });
+                
+                if (response.redirected || response.ok) {
+                    alert('✅ Account created successfully! Please login.');
+                    window.location.href = '/login';
+                } else {
+                    const text = await response.text();
+                    if (text.includes('Username already exists')) {
+                        alert('❌ Username already exists. Please choose another one.');
+                    } else {
+                        alert('❌ Registration failed. Please try again.');
+                    }
+                }
+            } catch (err) {
+                console.error('Registration error:', err);
+                alert('❌ Network error. Please make sure the server is running on port 5000.');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+        
+        // Add visual feedback for role selection
+        const roleSelect = document.getElementById('reg_role');
+        roleSelect.addEventListener('change', function() {
+            if (this.value === 'seller') {
+                console.log('Seller role selected - will redirect to seller dashboard');
+            } else if (this.value === 'student') {
+                console.log('Student role selected - will redirect to student dashboard');
+            }
+        });
+    </script>
+</body>
 </html>

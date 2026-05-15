@@ -9,7 +9,7 @@
     
     <style>
         :root {
-            --brand-blue: #0066FF; /* Professional Trust Blue */
+            --brand-blue: #0066FF; 
             --text-main: #1D1D1F;
             --text-muted: #86868B;
             --bg-light: #F5F5F7;
@@ -22,13 +22,12 @@
             line-height: 1.5;
         }
 
-        /* Subtle use of your gear image as a professional watermark */
         .hero-wrap {
             position: relative;
             background-color: var(--bg-light);
             background-image: linear-gradient(rgba(245, 245, 247, 0.98), rgba(245, 245, 247, 0.9)), 
-                              url("{{ url_for('static', filename='images/tech_bg.png') }}");
-            background-size: 35%; /* Reduced size for professional subtlety */
+                            url("{{ url_for('static', filename='images/tech_bg.png') }}");
+            background-size: 35%; 
             background-position: right bottom;
             background-repeat: no-repeat;
             padding: 100px 0;
@@ -61,7 +60,6 @@
             margin-bottom: 2.5rem;
         }
 
-        /* Clean White Consultation Card */
         .consultation-card {
             background: white;
             border: 1px solid #E5E5E5;
@@ -76,14 +74,25 @@
             color: var(--text-main);
             margin-bottom: 10px;
             display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .form-select-lg {
+        /* Styled the text input to match your pro theme */
+        .form-control-pro {
             border-radius: 8px;
             border: 1px solid #D2D2D7;
             font-size: 1rem;
             padding: 12px 16px;
             background-color: #FAFAFA;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+
+        .form-control-pro:focus {
+            outline: none;
+            border-color: var(--brand-blue);
+            background-color: white;
         }
 
         .btn-primary-pro {
@@ -101,16 +110,6 @@
             background-color: #0052CC;
             transform: translateY(-1px);
         }
-
-        .admin-link {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .admin-link:hover { color: var(--brand-blue); }
-
     </style>
 </head>
 <body>
@@ -118,7 +117,6 @@
     <nav class="navbar sticky-top">
         <div class="container d-flex justify-content-between">
             <a class="navbar-brand" href="/">ExpertRec</a>
-            <a href="/admin" class="admin-link">System Administration</a>
         </div>
     </nav>
 
@@ -133,21 +131,24 @@
                 
                 <div class="col-lg-5">
                     <div class="consultation-card">
-                        <form action="/recommend" method="POST">
+                        <form action="/search" method="GET">
                             <div class="mb-4">
-                                <label for="course_id" class="form-label">Primary Field of Study</label>
-                                <select name="course_id" id="course_id" class="form-select form-select-lg" required>
-                                    <option value="" selected disabled>Select academic path</option>
-                                    {% for course in courses %}
-                                    <option value="{{ course.id }}">{{ course.name }}</option>
-                                    {% endfor %}
-                                </select>
+                                <label for="user-course-input" class="form-label">Primary Field of Study</label>
+                                <input type="text" <input type="text" name="course_name" placeholder="Enter your course...">
+                                    name="course_name" 
+                                    id="user-course-input"
+                                    placeholder="e.g. Journalism, Law, ICT" 
+                                    class="form-control-pro"
+                                    required>
                             </div>
-                            
-                            <button type="submit" class="btn-primary-pro">
-                                View Recommendations
-                            </button>
-                        </form>
+    
+    <input type="hidden" name="processor_type" value="ALL">
+    <input type="hidden" name="budget" value="200000">
+
+    <button type="submit" class="btn-primary-pro">execute query</button>
+        View Recommendations
+    </button>
+</form>
                         <p class="mt-4 small text-center text-muted">Verification against PassMark database active.</p>
                     </div>
                 </div>

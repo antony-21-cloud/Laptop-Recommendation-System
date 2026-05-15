@@ -1,32 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://cdn.tailwindcss.com"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>LaptopIQ Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+        .hero {
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(15,15,15,0.8), rgba(15,15,15,0.8)), url('https://images.unsplash.com/photo-1514826786317-59744fe2a548?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 2rem;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+        .hero p {
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            max-width: 500px;
+            margin-bottom: 2.5rem;
+            opacity: 0.95;
+        }
+        .login-form {
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            max-width: 450px;
+            width: 100%;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1rem;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        .form-group input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        .form-group input:focus {
+            outline: none;
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 0 0 3px rgba(34,211,238,0.3);
+        }
+        .login-btn {
+            width: 100%;
+            padding: 1.2rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 100%);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(34,211,238,0.4);
+        }
+        .register-link {
+            margin-top: 1.5rem;
+            color: rgba(255,255,255,0.8);
+        }
+        .register-link a {
+            color: #22d3ee;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        @media (max-width: 768px) {
+            .hero {
+                padding: 1rem;
+            }
+            .login-form {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Login</h1>
-    <form action="/login" method="post">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username"><br><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password"><br><br>
-        <input type="submit" value="Login">
-    </form>
+    <section class="hero">
+        <h1>LAPTOP<span class="text-cyan-400">IQ</span></h1>
+        <p>Access your account to browse premium laptops or manage listings.</p>
+        
+        <div class="login-form">
+            <form action="/login" method="post">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="login-btn">LOGIN</button>
+            </form>
+            
+            <p class="register-link">New here? <a href="/register">Create Account</a></p>
+        </div>
 
-<div class="space-y-4">
-    <input type="text" id="login-user" placeholder="USERNAME" class="w-full bg-slate-950 border border-slate-800 p-3 text-cyan-400">
-    <input type="password" id="login-pass" placeholder="PASSWORD" class="w-full bg-slate-950 border border-slate-800 p-3 text-cyan-400">
-    <button onclick="executeLogin()" class="w-full bg-cyan-600 p-3 font-bold uppercase text-xs">Authorize_Access</button>
-</div>
-
-<style>
-    body {
-        background-image: url("{{ url_for('static', filename='images/login.jpg') }}");
-        background-size: cover;
-    }
-</style>
-
+        <div style="margin-top: 2rem; opacity: 0.8; font-size: 0.9rem;">
+            <a href="/" style="color: rgba(255,255,255,0.7); margin: 0 1rem; text-decoration: none;">Home</a> |
+            <a href="/register" style="color: rgba(255,255,255,0.7); margin: 0 1rem; text-decoration: none;">Register</a>
+        </div>
+    </section>
 </body>
 </html>

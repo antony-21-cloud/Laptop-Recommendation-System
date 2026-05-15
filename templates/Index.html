@@ -1,34 +1,103 @@
-
-<!doctype html>
-    <html>
-        <head>
-            <style>
-                body {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                    margin: 0;
-                    background-color: rgb(139, 105, 231);
-                }
-                .login-box {
-                    background-color: rgb(139, 105, 231);
-                    padding: 20px;
-                    
-                }
-            </style>
-            <title>login page</title>
-    </head>
-    <body style="background-color:rgb(139, 105, 231);">
-        <div class="login-box"></div>
-        <h1>Login</h1>
-        <form action="/login" method="post">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username"><br><br>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password"><br><br>
-            <input type="submit" value="Login">
-        </form>
-
-    </body></html>
-</doctype>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaptopIQ - Premium Laptops</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+        .hero {
+            height: 100vh;
+            background-image: linear-gradient(rgba(15,15,15,0.7), rgba(15,15,15,0.7)), url('https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+        }
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+        .hero p {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            max-width: 600px;
+            margin-bottom: 3rem;
+            opacity: 0.95;
+        }
+        .cta-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            max-width: 800px;
+            width: 90%;
+        }
+        .cta-btn {
+            padding: 1.2rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(34,211,238,0.4);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: #22d3ee;
+        }
+        @media (max-width: 768px) {
+            .cta-buttons {
+                grid-template-columns: 1fr;
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <h1>LAPTOP<span class="text-cyan-400">IQ</span></h1>
+        <p>Discover premium laptops engineered for performance. From gaming beasts to professional workstations – find your perfect match today.</p>
+        <div class="cta-buttons">
+        
+            <a href="/login" class="cta-btn btn-secondary">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+            <a href="/register" class="cta-btn btn-secondary">
+                <i class="fas fa-user-plus"></i> Get Started
+            </a>
+        </div>
+    </section>
+</body>

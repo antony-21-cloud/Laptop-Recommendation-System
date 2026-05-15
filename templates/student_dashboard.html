@@ -1,32 +1,433 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="min-h-screen bg-slate-950 text-slate-100 p-6 font-mono">
-    <div class="border-b border-slate-800 pb-4 mb-8">
-        <h1 class="text-2xl font-bold text-emerald-400 tracking-tighter">TERMINAL://STUDENT_SEARCH</h1>
-        <p class="text-xs text-slate-500">Querying Available High-Performance Hardware...</p>
+<div class="p-8 max-w-full">
+    
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8 pb-4 border-b border-gray-800">
+        <div>
+            <h1 class="text-4xl font-bold text-white">Student Portal</h1>
+            <p class="text-gray-500 text-sm mt-2">Find your perfect laptop match</p>
+        </div>
+        <div class="bg-black px-6 py-3 rounded-xl border border-gray-800">
+            <span class="text-gray-400">Welcome back,</span>
+            <span class="text-blue-400 font-bold ml-2">{{ current_user.username }}</span>
+        </div>
     </div>
 
-    <div class="bg-slate-900 border border-slate-800 p-4 rounded-lg mb-8 flex flex-wrap gap-4 items-end">
-        <div class="flex-1 min-w-[200px]">
-            <label class="block text-[10px] text-slate-500 mb-1 uppercase">Processor_Type</label>
-            <select id="filter-processor" class="w-full bg-slate-950 border border-slate-800 p-2 text-emerald-400 outline-none focus:border-emerald-500">
-                <option value="">ALL_CPUs</option>
-                <option value="Ryzen 7">Ryzen 7</option>
-                <option value="Core i7">Core i7</option>
-                <option value="Apple M2">Apple M2</option>
-            </select>
+    <!-- ==================== HOME TAB ==================== -->
+    <div id="tab-home" class="tab-content">
+        <div class="bg-black border border-gray-800 rounded-xl p-8 max-w-5xl mx-auto">
+            <h3 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-800">Student Profile</h3>
+            <div class="grid grid-cols-2 gap-6">
+                <div><p class="text-gray-500 text-sm mb-1">Name:</p><p class="text-white text-lg">{{ current_user.username }}</p></div>
+                <div><p class="text-gray-500 text-sm mb-1">Username:</p><p class="text-white text-lg">{{ current_user.username }}</p></div>
+                <div><p class="text-gray-500 text-sm mb-1">Email:</p><p class="text-white text-lg">{{ current_user.email|default('Not set') }}</p></div>
+                <div><p class="text-gray-500 text-sm mb-1">Field of Study:</p><p class="text-white text-lg">{{ current_user.field_of_study|default('Not set') }}</p></div>
+                <div class="col-span-2"><p class="text-gray-500 text-sm mb-1">Institution:</p><p class="text-white text-lg">{{ current_user.institution|default('Not set') }}</p></div>
+                <div class="col-span-2"><p class="text-gray-500 text-sm mb-1">Preferred Brands:</p><p class="text-white text-lg">{{ current_user.preferred_brands|default('Not set') }}</p></div>
+                <div class="col-span-2"><p class="text-gray-500 text-sm mb-1">Purpose:</p><p class="text-white text-lg">{{ current_user.purpose|default('Not set') }}</p></div>
+            </div>
         </div>
-        <div class="flex-1 min-w-[200px]">
-            <label class="block text-[10px] text-slate-500 mb-1 uppercase">Budget_Cap (Ksh)</label>
-            <input type="number" id="filter-price" placeholder="Max Price" class="w-full bg-slate-950 border border-slate-800 p-2 text-emerald-400 outline-none focus:border-emerald-500">
-        </div>
-        <button onclick="searchLaptops()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded font-bold text-xs uppercase transition-all">
-            EXECUTE_QUERY
-        </button>
     </div>
 
-    <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- ==================== SEARCH TAB ==================== -->
+    <div id="tab-search" class="tab-content hidden">
+        <div class="max-w-full mx-auto">
+            <!-- Search Filters -->
+            <div class="bg-black border border-gray-800 rounded-xl p-8 mb-10">
+                <h3 class="text-xl font-bold text-white mb-6 text-center">Search Filters</h3>
+                <form id="search-form" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div>
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Field of Study:</label>
+                        <input type="text" name="field_of_study" placeholder="e.g., Cybersecurity" class="w-full p-3 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Processor:</label>
+                        <input type="text" name="processor" placeholder="e.g., Ryzen 7, Core i7" class="w-full p-3 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Max Budget (KES):</label>
+                        <input type="number" name="budget" placeholder="Enter amount" class="w-full p-3 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Min RAM (GB):</label>
+                        <input type="number" name="ram" placeholder="e.g., 8, 16" class="w-full p-3 rounded-lg">
+                    </div>
+                    <div class="md:col-span-4">
+                        <button type="submit" class="w-full bg-white text-black py-3 rounded-lg font-bold hover:bg-blue-600 hover:text-white transition-all">SEARCH LAPTOPS</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Header -->
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-white font-bold text-lg">Recommended Laptops</h3>
+                <p id="result-count" class="text-gray-500 text-sm">Loading...</p>
+            </div>
+
+            <!-- Laptop Results Grid -->
+            <div id="laptop-results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Laptop cards injected here -->
+            </div>
         </div>
+    </div>
+
+    <!-- ==================== REQUESTS TAB ==================== -->
+    <div id="tab-requests" class="tab-content hidden">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-3xl font-bold text-white mb-2">My Requests</h2>
+            <p class="text-gray-500 mb-6">Track your laptop inquiries</p>
+            <div id="requests-list" class="space-y-4">
+                <div id="no-requests-message" class="bg-black border border-gray-800 rounded-xl p-16 text-center">
+                    <i class="fas fa-inbox text-5xl text-gray-700 mb-4"></i>
+                    <p class="text-gray-500 text-lg mb-4">No Active Requests</p>
+                    <button onclick="dashboardShowTab('search')" class="bg-white text-black px-6 py-2 rounded-lg font-bold hover:bg-blue-600 hover:text-white transition-all">Browse Laptops</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SUPPORT TAB ==================== -->
+    <div id="tab-support" class="tab-content hidden">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-white mb-2">Support</h2>
+            <p class="text-gray-500 mb-6">Get help from our team</p>
+            <div class="bg-black border border-gray-800 rounded-xl p-8">
+                <form method="POST" action="{{ url_for('submit_support') }}">
+                    <div class="mb-6">
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Subject:</label>
+                        <input type="text" name="subject" required class="w-full p-4 rounded-lg">
+                    </div>
+                    <div class="mb-6">
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Message:</label>
+                        <textarea name="message" required rows="6" class="w-full p-4 rounded-lg"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-white text-black py-3 rounded-lg font-bold hover:bg-blue-600 hover:text-white transition-all">SUBMIT REQUEST</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Inquiry Modal -->
+<div id="inquiry-modal" class="fixed inset-0 bg-black/95 hidden items-center justify-center z-50">
+    <div class="bg-black border border-gray-800 rounded-xl p-8 w-full max-w-md">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-white font-bold text-xl">Inquire About Laptop</h3>
+            <button onclick="closeModal()" class="text-gray-500 hover:text-white"><i class="fas fa-times text-2xl"></i></button>
+        </div>
+        <div class="bg-gray-900 p-4 rounded-lg mb-6">
+            <p id="modal-laptop-details" class="text-blue-400 font-bold"></p>
+            <p id="modal-seller-info" class="text-gray-500 text-sm"></p>
+        </div>
+        <textarea id="custom-message" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-4 text-white h-32 mb-6" placeholder="Type your message to the seller..."></textarea>
+        <div class="flex gap-4">
+            <button onclick="closeModal()" class="flex-1 bg-gray-800 py-3 rounded-lg text-white font-bold hover:bg-gray-700 transition-all">Cancel</button>
+            <button onclick="sendInquiry()" class="flex-1 bg-white text-black py-3 rounded-lg font-bold hover:bg-blue-600 hover:text-white transition-all">Send Inquiry</button>
+        </div>
+    </div>
+</div>
+
+<!-- Laptop Details Modal -->
+<div id="laptop-details-modal" class="fixed inset-0 bg-black/95 hidden items-center justify-center z-50">
+    <div class="bg-black border border-gray-800 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div class="sticky top-0 bg-black p-4 border-b border-gray-800 flex justify-between items-center">
+            <h3 class="text-2xl font-bold text-white">Laptop Details</h3>
+            <button onclick="closeDetailsModal()" class="text-gray-500 hover:text-white text-3xl">&times;</button>
+        </div>
+        
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Image Section -->
+                <div class="bg-gray-900 rounded-xl p-4 flex items-center justify-center min-h-[300px]">
+                    <img id="detail-image" src="" alt="Laptop" class="max-w-full max-h-[400px] object-contain">
+                </div>
+                
+                <!-- Details Section -->
+                <div class="space-y-4">
+                    <div>
+                        <h2 id="detail-name" class="text-3xl font-bold text-white mb-2"></h2>
+                        <p id="detail-brand" class="text-blue-400 text-lg"></p>
+                    </div>
+                    
+                    <div class="border-t border-gray-800 pt-4">
+                        <p class="text-gray-500 text-sm mb-1">Price</p>
+                        <p id="detail-price" class="text-3xl font-bold text-green-400"></p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-gray-500 text-sm mb-1">Processor</p>
+                            <p id="detail-processor" class="text-white font-semibold"></p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm mb-1">RAM</p>
+                            <p id="detail-ram" class="text-white font-semibold"></p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm mb-1">Storage</p>
+                            <p id="detail-storage" class="text-white font-semibold"></p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm mb-1">GPU/Graphics</p>
+                            <p id="detail-gpu" class="text-white font-semibold"></p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <p class="text-gray-500 text-sm mb-1">Full Specifications</p>
+                        <p id="detail-specs" class="text-gray-300 text-sm bg-gray-900 p-3 rounded-lg"></p>
+                    </div>
+                    
+                    <div class="border-t border-gray-800 pt-4">
+                        <p class="text-gray-500 text-sm mb-1">Seller Information</p>
+                        <p id="detail-seller" class="text-white"></p>
+                    </div>
+                    
+                    <button id="detail-inquire-btn" class="w-full bg-white text-black py-3 rounded-lg font-bold hover:bg-blue-600 hover:text-white transition-all mt-4">
+                        INQUIRE ABOUT THIS LAPTOP
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedLaptopData = null;
+    let currentSellerId = {{ current_user.id|tojson }};
+    let allLaptops = [];
+    let displayLimit = 12;
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+function updateResultsGrid(laptops) {
+    const grid = document.getElementById('laptop-results');
+    const resultCount = document.getElementById('result-count');
+    if (!grid) return;
+    
+    const displayLimit = 12;
+    const limitedLaptops = laptops.slice(0, displayLimit);
+    
+    if (resultCount) {
+        resultCount.textContent = 'Showing ' + limitedLaptops.length + ' of ' + laptops.length + ' laptops';
+    }
+    
+    grid.innerHTML = '';
+    
+    if (limitedLaptops.length === 0) {
+        grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-20">No laptops found. Try different filters.</div>';
+        return;
+    }
+    
+    for (let i = 0; i < limitedLaptops.length; i++) {
+        const laptop = limitedLaptops[i];
+        const displayName = laptop.name || (laptop.brand + ' ' + (laptop.model || ''));
+        const specsLine = (laptop.ram || '?') + 'GB RAM - ' + (laptop.storage || '?') + 'GB SSD - ' + (laptop.gpu || 'Integrated');
+        
+        // Check if laptop has an image
+        const hasImage = laptop.image && laptop.image !== '';
+        const imageHtml = hasImage 
+            ? '<img src="' + laptop.image + '" class="w-full h-48 object-cover cursor-pointer" onclick="showLaptopDetails(' + laptop.id + ')">'
+            : '<div class="w-full h-48 bg-gray-900 flex items-center justify-center cursor-pointer" onclick="showLaptopDetails(' + laptop.id + ')"><i class="fas fa-laptop text-5xl text-gray-700"></i></div>';
+        
+        const card = '<div class="bg-black border border-gray-800 rounded-xl overflow-hidden hover:border-blue-500 transition-all">' +
+            '<div class="h-48 bg-gray-900">' + imageHtml + '</div>' +
+            '<div class="p-5"><h4 class="text-lg font-bold text-white mb-2 truncate">' + escapeHtml(displayName) + '</h4>' +
+            '<p class="text-2xl font-bold text-blue-400 mb-3">KES ' + Number(laptop.price).toLocaleString() + '</p>' +
+            '<p class="text-gray-500 text-sm mb-4">' + escapeHtml(specsLine) + '</p>' +
+            '<button onclick="openInquiryModal(' + laptop.id + ', \'' + escapeHtml(displayName) + '\', ' + (laptop.seller_id || 0) + ', ' + laptop.price + ')" class="w-full bg-white text-black py-2 rounded-lg font-bold text-sm hover:bg-blue-600 hover:text-white transition-all">INQUIRE SELLER</button></div></div>';
+        grid.insertAdjacentHTML('beforeend', card);
+    }
+}
+
+
+// Store current laptop details for modal
+let currentDetailLaptop = null;
+
+// Function to show laptop details modal
+window.showLaptopDetails = async function(laptopId) {
+    try {
+        // Fetch full laptop details from API
+        const response = await fetch('/api/laptop/' + laptopId);
+        const laptop = await response.json();
+        currentDetailLaptop = laptop;
+        
+        // Populate modal with data
+        document.getElementById('detail-image').src = laptop.image || 'https://via.placeholder.com/400x300?text=No+Image';
+        document.getElementById('detail-name').textContent = laptop.name || 'Unknown';
+        document.getElementById('detail-brand').textContent = laptop.brand || 'Brand not specified';
+        document.getElementById('detail-price').textContent = 'KES ' + Number(laptop.price).toLocaleString();
+        document.getElementById('detail-processor').textContent = laptop.processor_type || 'Not specified';
+        document.getElementById('detail-ram').textContent = laptop.ram ? laptop.ram + 'GB' : 'Not specified';
+        document.getElementById('detail-storage').textContent = laptop.storage ? laptop.storage + 'GB SSD' : 'Not specified';
+        document.getElementById('detail-gpu').textContent = laptop.gpu || 'Integrated';
+        document.getElementById('detail-specs').textContent = laptop.specs || 'No additional specifications provided.';
+        document.getElementById('detail-seller').textContent = laptop.seller_name || 'Unknown Seller';
+        
+        // Set up the inquire button in modal
+        const inquireBtn = document.getElementById('detail-inquire-btn');
+        inquireBtn.onclick = function() {
+            closeDetailsModal();
+            openInquiryModal(laptop.id, laptop.name, laptop.seller_id, laptop.price);
+        };
+        
+        // Show modal
+        document.getElementById('laptop-details-modal').classList.remove('hidden');
+        document.getElementById('laptop-details-modal').classList.add('flex');
+        
+    } catch (error) {
+        console.error('Error loading laptop details:', error);
+        alert('Could not load laptop details. Please try again.');
+    }
+};
+
+// Close details modal
+window.closeDetailsModal = function() {
+    document.getElementById('laptop-details-modal').classList.add('hidden');
+    document.getElementById('laptop-details-modal').classList.remove('flex');
+};
+
+// Close modal when clicking outside
+document.getElementById('laptop-details-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeDetailsModal();
+    }
+});
+
+
+    async function fetchLaptops(params = {}) {
+        const url = new URL('/api/search', window.location.origin);
+        Object.keys(params).forEach(function(key) {
+            if (params[key]) url.searchParams.append(key, params[key]);
+        });
+        
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Network error');
+            const laptops = await response.json();
+            allLaptops = laptops;
+            updateResultsGrid(laptops);
+        } catch (err) {
+            console.error('Fetch error:', err);
+            document.getElementById('laptop-results').innerHTML = '<div class="col-span-full text-center text-red-500 py-20">Failed to load laptops.</div>';
+        }
+    }
+
+    document.getElementById('search-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const params = {
+            processor: formData.get('processor'),
+            field_of_study: formData.get('field_of_study'),
+            budget: formData.get('budget'),
+            ram: formData.get('ram')
+        };
+        fetchLaptops(params);
+    });
+
+    window.openInquiryModal = function(id, name, sellerId, price) {
+        selectedLaptopData = { id: id, name: name, seller_id: sellerId, price: price };
+        document.getElementById('modal-laptop-details').innerHTML = '<i class="fas fa-laptop"></i> ' + name;
+        document.getElementById('modal-seller-info').innerHTML = '<i class="fas fa-store"></i> Seller ID: ' + sellerId + ' | KES ' + Number(price).toLocaleString();
+        document.getElementById('inquiry-modal').classList.remove('hidden');
+        document.getElementById('inquiry-modal').classList.add('flex');
+        document.getElementById('custom-message').value = '';
+    };
+    
+    window.closeModal = function() {
+        document.getElementById('inquiry-modal').classList.add('hidden');
+        document.getElementById('inquiry-modal').classList.remove('flex');
+    };
+    
+    window.sendInquiry = async function() {
+        const msg = document.getElementById('custom-message').value.trim();
+        if (!msg) { alert('Please enter a message.'); return; }
+        if (!selectedLaptopData) { alert('No laptop selected.'); return; }
+        try {
+            const res = await fetch('/inquire', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ laptop_id: selectedLaptopData.id, message: msg })
+            });
+            if (res.ok) {
+                alert('Inquiry sent!');
+                closeModal();
+                loadUserRequests();
+            } else {
+                const data = await res.json();
+                alert('Error: ' + (data.error || 'Unknown'));
+            }
+        } catch (err) {
+            alert('Network error.');
+        }
+    };
+
+async function loadUserRequests() {
+    try {
+        const response = await fetch('/api/my-requests/' + currentUserId);
+        if (!response.ok) return;
+        const requests = await response.json();
+        const container = document.getElementById('requests-list');
+        const noMsg = document.getElementById('no-requests-message');
+        
+        if (!requests.length) { 
+            if (noMsg) noMsg.style.display = 'block'; 
+            return; 
+        }
+        
+        if (noMsg) noMsg.style.display = 'none';
+        container.innerHTML = '';
+        
+        for (let i = 0; i < requests.length; i++) {
+            const req = requests[i];
+            const lapRes = await fetch('/api/laptop/' + req.laptop_id);
+            const laptop = await lapRes.json();
+            
+            var sellerReplyHtml = '';
+            if (req.seller_reply) {
+                sellerReplyHtml = '<div class="bg-green-900/30 p-4 rounded-lg mt-3">' +
+                    '<p class="text-green-400 text-xs mb-1">Seller Reply:</p>' +
+                    '<p class="text-white text-sm">' + escapeHtml(req.seller_reply) + '</p>' +
+                    '<p class="text-gray-500 text-xs mt-2">Received: ' + new Date(req.replied_at).toLocaleString() + '</p>' +
+                '</div>';
+            }
+            
+            const card = '<div class="bg-black border border-gray-800 rounded-xl p-6">' +
+                '<div class="flex justify-between">' +
+                    '<h4 class="text-white font-bold text-lg">' + escapeHtml(laptop.name) + '</h4>' +
+                    '<span class="text-gray-500 text-xs">' + (req.created_at ? new Date(req.created_at).toLocaleString() : 'Unknown') + '</span>' +
+                '</div>' +
+                '<p class="text-blue-400 text-sm">Seller ID: ' + req.seller_id + '</p>' +
+                '<div class="bg-gray-900 p-4 rounded-lg mt-2">' +
+                    '<p class="text-gray-500 text-xs mb-1">Your Message:</p>' +
+                    '<p class="text-white">' + escapeHtml(req.message || 'No message') + '</p>' +
+                '</div>' +
+                sellerReplyHtml +
+                '<div class="mt-3">' +
+                    '<span class="px-3 py-1 rounded-full text-xs font-bold ' + (req.reply_status === 'replied' ? 'bg-green-900 text-green-400' : 'bg-yellow-900 text-yellow-400') + '">' +
+                        (req.reply_status === 'replied' ? '✓ Replied by Seller' : 'Awaiting Response') +
+                    '</span>' +
+                '</div>' +
+            '</div>';
+            container.insertAdjacentHTML('beforeend', card);
+        }
+    } catch (err) { console.error(err); }
+}
+
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchLaptops();
+        loadUserRequests();
+        dashboardShowTab('home');
+    });
+</script>
 {% endblock %}
