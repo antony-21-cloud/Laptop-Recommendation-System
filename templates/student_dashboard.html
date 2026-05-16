@@ -16,20 +16,211 @@
     </div>
 
     <!-- ==================== HOME TAB ==================== -->
-    <div id="tab-home" class="tab-content">
-        <div class="bg-black border border-gray-800 rounded-xl p-8 max-w-5xl mx-auto">
-            <h3 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-800">Student Profile</h3>
-            <div class="grid grid-cols-2 gap-6">
-                <div><p class="text-gray-500 text-sm mb-1">Name:</p><p class="text-white text-lg">{{ current_user.username }}</p></div>
-                <div><p class="text-gray-500 text-sm mb-1">Username:</p><p class="text-white text-lg">{{ current_user.username }}</p></div>
-                <div><p class="text-gray-500 text-sm mb-1">Email:</p><p class="text-white text-lg">{{ current_user.email|default('Not set') }}</p></div>
-                <div><p class="text-gray-500 text-sm mb-1">Field of Study:</p><p class="text-white text-lg">{{ current_user.field_of_study|default('Not set') }}</p></div>
-                <div class="col-span-2"><p class="text-gray-500 text-sm mb-1">Institution:</p><p class="text-white text-lg">{{ current_user.institution|default('Not set') }}</p></div>
-                <div class="col-span-2"><p class="text-gray-500 text-sm mb-1">Preferred Brands:</p><p class="text-white text-lg">{{ current_user.preferred_brands|default('Not set') }}</p></div>
-                <div class="col-span-2"><p class="text-gray-500 text-sm mb-1">Purpose:</p><p class="text-white text-lg">{{ current_user.purpose|default('Not set') }}</p></div>
+    <!-- ==================== HOME TAB ==================== -->
+<div id="tab-home" class="tab-content">
+    <!-- Welcome Banner -->
+    <div class="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-2xl p-8 mb-8 border border-blue-500/30">
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-3xl font-bold text-white mb-2">
+                    Welcome back, <span class="text-blue-400">{{ current_user.username }}</span>!
+                </h2>
+                <p class="text-gray-400 text-lg">Ready to find your perfect laptop match? 🚀</p>
+            </div>
+            <div class="text-right">
+                <p class="text-gray-500 text-sm">Today is</p>
+                <p class="text-white font-semibold" id="current-date"></p>
+            </div>
+        </div>
+        
+        <!-- Quick Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            <div class="bg-black/50 rounded-xl p-4 border border-gray-700">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-laptop text-2xl text-blue-400"></i>
+                    <div>
+                        <p class="text-gray-500 text-sm">Laptops Available</p>
+                        <p class="text-white text-xl font-bold" id="total-laptops-count">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-black/50 rounded-xl p-4 border border-gray-700">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-envelope text-2xl text-green-400"></i>
+                    <div>
+                        <p class="text-gray-500 text-sm">My Inquiries</p>
+                        <p class="text-white text-xl font-bold" id="my-inquiries-count">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-black/50 rounded-xl p-4 border border-gray-700">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-check-circle text-2xl text-yellow-400"></i>
+                    <div>
+                        <p class="text-gray-500 text-sm">Active Requests</p>
+                        <p class="text-white text-xl font-bold" id="active-requests-count">Loading...</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Profile Section -->
+    <div class="bg-black border border-gray-800 rounded-2xl overflow-hidden">
+        <div class="bg-gradient-to-r from-gray-900 to-black px-6 py-4 border-b border-gray-800 flex justify-between items-center">
+            <div>
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fas fa-user-circle text-blue-400 text-2xl"></i> My Profile
+                </h3>
+                <p class="text-gray-500 text-sm mt-1">Manage your personal information</p>
+            </div>
+            <button onclick="toggleProfileEdit()" id="edit-profile-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2">
+                <i class="fas fa-edit"></i> Edit Profile
+            </button>
+        </div>
+        
+        <!-- View Mode -->
+        <div id="profile-view-mode" class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3 pb-2 border-b border-gray-800">
+                        <i class="fas fa-user text-blue-400 w-5"></i>
+                        <div>
+                            <p class="text-gray-500 text-xs">Full Name</p>
+                            <p class="text-white font-medium" id="view-name">{{ current_user.name|default('Not set') }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 pb-2 border-b border-gray-800">
+                        <i class="fas fa-envelope text-blue-400 w-5"></i>
+                        <div>
+                            <p class="text-gray-500 text-xs">Email Address</p>
+                            <p class="text-white font-medium" id="view-email">{{ current_user.email|default('Not set') }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 pb-2 border-b border-gray-800">
+                        <i class="fas fa-graduation-cap text-blue-400 w-5"></i>
+                        <div>
+                            <p class="text-gray-500 text-xs">Field of Study</p>
+                            <p class="text-white font-medium" id="view-field">{{ current_user.field_of_study|default('Not set') }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 pb-2 border-b border-gray-800">
+                        <i class="fas fa-university text-blue-400 w-5"></i>
+                        <div>
+                            <p class="text-gray-500 text-xs">Institution</p>
+                            <p class="text-white font-medium" id="view-institution">{{ current_user.institution|default('Not set') }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3 pb-2 border-b border-gray-800">
+                        <i class="fas fa-calendar-alt text-blue-400 w-5"></i>
+                        <div>
+                            <p class="text-gray-500 text-xs">Member Since</p>
+                            <p class="text-white font-medium">{{ current_user.created_at.strftime('%B %d, %Y') if current_user.created_at else 'N/A' }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 pb-2 border-b border-gray-800">
+                        <i class="fas fa-laptop-code text-blue-400 w-5"></i>
+                        <div>
+                            <p class="text-gray-500 text-xs">Preferred Brands</p>
+                            <p class="text-white font-medium" id="view-brands">{{ current_user.preferred_brands|default('Not set') }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 pb-2 border-b border-gray-800">
+                        <i class="fas fa-microchip text-blue-400 w-5"></i>
+                        <div>
+                            <p class="text-gray-500 text-xs">Preferred Specs</p>
+                            <p class="text-white font-medium" id="view-specs">{{ current_user.preferred_specs|default('Not set') }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 pb-2 border-b border-gray-800">
+                        <i class="fas fa-bullseye text-blue-400 w-5"></i>
+                        <div>
+                            <p class="text-gray-500 text-xs">Primary Purpose</p>
+                            <p class="text-white font-medium" id="view-purpose">{{ current_user.purpose|default('Not set') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Mode -->
+        <div id="profile-edit-mode" class="hidden p-6">
+            <form id="profile-edit-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Full Name</label>
+                        <input type="text" id="edit-name" value="{{ current_user.name or '' }}" placeholder="Enter your full name" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Email Address</label>
+                        <input type="email" id="edit-email" value="{{ current_user.email or '' }}" placeholder="your@email.com" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Field of Study</label>
+                        <select id="edit-field" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:border-blue-500 focus:outline-none">
+                            <option value="">Select your field of study</option>
+                            <option value="Information Communication Technology (ICT)" {% if current_user.field_of_study == 'Information Communication Technology (ICT)' %}selected{% endif %}>💻 Information Communication Technology (ICT)</option>
+                            <option value="Computer Science" {% if current_user.field_of_study == 'Computer Science' %}selected{% endif %}>🖥️ Computer Science</option>
+                            <option value="Cybersecurity" {% if current_user.field_of_study == 'Cybersecurity' %}selected{% endif %}>🔒 Cybersecurity</option>
+                            <option value="Software Engineering" {% if current_user.field_of_study == 'Software Engineering' %}selected{% endif %}>📱 Software Engineering</option>
+                            <option value="Data Science" {% if current_user.field_of_study == 'Data Science' %}selected{% endif %}>📊 Data Science</option>
+                            <option value="Graphic Design" {% if current_user.field_of_study == 'Graphic Design' %}selected{% endif %}>🎨 Graphic Design</option>
+                            <option value="Business Information Technology" {% if current_user.field_of_study == 'Business Information Technology' %}selected{% endif %}>💼 Business Information Technology</option>
+                            <option value="Law" {% if current_user.field_of_study == 'Law' %}selected{% endif %}>⚖️ Law</option>
+                            <option value="Engineering" {% if current_user.field_of_study == 'Engineering' %}selected{% endif %}>🔧 Engineering</option>
+                            <option value="Medicine" {% if current_user.field_of_study == 'Medicine' %}selected{% endif %}>🏥 Medicine</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Institution</label>
+                        <input type="text" id="edit-institution" value="{{ current_user.institution or '' }}" placeholder="Your university/college" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Preferred Laptop Brands</label>
+                        <input type="text" id="edit-brands" value="{{ current_user.preferred_brands or '' }}" placeholder="e.g., Dell, HP, Lenovo, Apple" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:border-blue-500 focus:outline-none">
+                        <p class="text-gray-500 text-xs mt-1">Separate multiple brands with commas</p>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Preferred Specifications</label>
+                        <input type="text" id="edit-specs" value="{{ current_user.preferred_specs or '' }}" placeholder="e.g., 16GB RAM, 512GB SSD" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Primary Purpose (What will you use the laptop for?)</label>
+                        <textarea id="edit-purpose" rows="2" placeholder="e.g., Programming, Gaming, Video Editing, Online Classes, Graphic Design" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:border-blue-500 focus:outline-none">{{ current_user.purpose or '' }}</textarea>
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-6">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold transition-all flex items-center gap-2">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <button type="button" onclick="cancelProfileEdit()" class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-bold transition-all flex items-center gap-2">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quick Tips Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        <div class="bg-gradient-to-r from-blue-900/20 to-black rounded-xl p-5 border border-blue-500/20">
+            <div class="flex items-center gap-3 mb-3">
+                <i class="fas fa-lightbulb text-yellow-400 text-xl"></i>
+                <h4 class="text-white font-bold">Pro Tip #1</h4>
+            </div>
+            <p class="text-gray-400 text-sm">Use the course-based search filter to get laptops recommended specifically for your field of study!</p>
+        </div>
+        <div class="bg-gradient-to-r from-purple-900/20 to-black rounded-xl p-5 border border-purple-500/20">
+            <div class="flex items-center gap-3 mb-3">
+                <i class="fas fa-comments text-green-400 text-xl"></i>
+                <h4 class="text-white font-bold">Pro Tip #2</h4>
+            </div>
+            <p class="text-gray-400 text-sm">Don't hesitate to inquire with sellers about warranty, delivery, and bulk purchase discounts!</p>
+        </div>
+    </div>
+</div>
 
     <!-- ==================== SEARCH TAB ==================== -->
     <div id="tab-search" class="tab-content hidden">
@@ -429,5 +620,112 @@ async function loadUserRequests() {
         loadUserRequests();
         dashboardShowTab('home');
     });
+
+// ==================== PROFILE EDITING ====================
+function toggleProfileEdit() {
+    var viewMode = document.getElementById('profile-view-mode');
+    var editMode = document.getElementById('profile-edit-mode');
+    var editBtn = document.getElementById('edit-profile-btn');
+    
+    if (viewMode.classList.contains('hidden')) {
+        viewMode.classList.remove('hidden');
+        editMode.classList.add('hidden');
+        editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit Profile';
+        editBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+        editBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+    } else {
+        viewMode.classList.add('hidden');
+        editMode.classList.remove('hidden');
+        editBtn.innerHTML = '<i class="fas fa-eye"></i> View Profile';
+        editBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+        editBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+    }
+}
+
+function cancelProfileEdit() {
+    location.reload();
+}
+
+// Profile form submission
+var profileForm = document.getElementById('profile-edit-form');
+if (profileForm) {
+    profileForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        var formData = {
+            name: document.getElementById('edit-name').value,
+            email: document.getElementById('edit-email').value,
+            field_of_study: document.getElementById('edit-field').value,
+            institution: document.getElementById('edit-institution').value,
+            preferred_brands: document.getElementById('edit-brands').value,
+            preferred_specs: document.getElementById('edit-specs').value,
+            purpose: document.getElementById('edit-purpose').value
+        };
+        
+        try {
+            var response = await fetch('/api/update-profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+            
+            if (response.ok) {
+                alert('Profile updated successfully!');
+                location.reload();
+            } else {
+                alert('Error updating profile');
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            alert('Network error. Please try again.');
+        }
+    });
+}
+
+// ==================== HOME TAB STATS ====================
+async function loadHomeStats() {
+    try {
+        // Get total laptops count
+        var laptopResponse = await fetch('/api/search');
+        var laptops = await laptopResponse.json();
+        document.getElementById('total-laptops-count').textContent = laptops.length;
+        
+        // Get user inquiries count
+        var inquiriesResponse = await fetch('/api/my-requests/' + currentUserId);
+        var inquiries = await inquiriesResponse.json();
+        document.getElementById('my-inquiries-count').textContent = inquiries.length;
+        
+        // Count active/pending requests
+        var activeCount = inquiries.filter(function(req) {
+            return req.status === 'Pending';
+        }).length;
+        document.getElementById('active-requests-count').textContent = activeCount;
+        
+    } catch(err) {
+        console.error('Error loading stats:', err);
+    }
+}
+
+// Display current date
+function displayCurrentDate() {
+    var dateElement = document.getElementById('current-date');
+    if (dateElement) {
+        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        var today = new Date().toLocaleDateString('en-US', options);
+        dateElement.textContent = today;
+    }
+}
+
+// Update the DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', function() {
+    fetchLaptops();
+    loadUserRequests();
+    loadHomeStats();
+    displayCurrentDate();
+    if (typeof dashboardShowTab === 'function') {
+        dashboardShowTab('home');
+    }
+});
+
 </script>
 {% endblock %}

@@ -154,15 +154,30 @@ def register():
 @app.route('/seller_dashboard')
 @login_required
 def seller_dashboard():
-    """Seller's main dashboard - shows their listed laptops and inquiries"""
-    # Only allow users with role 'seller' or admin user 'Aristo'
     if current_user.role != 'seller' and current_user.username != 'Aristo':
         flash("Access denied. Seller dashboard is for sellers only.")
         return redirect(url_for('student_dashboard'))
     
-    # Get only laptops belonging to this seller (filter by seller_id)
+    # Get only laptops belonging to this seller
     my_laptops = Laptop.query.filter_by(seller_id=current_user.id).all()
-    return render_template('seller_dashboard.html', laptops=my_laptops, count=len(my_laptops))
+    
+    # Convert to serializable format for JSON
+    serialized_laptops = []
+    for laptop in my_laptops:
+        serialized_laptops.append({
+            'id': laptop.id,
+            'name': laptop.name,
+            'processor_type': laptop.processor_type,
+            'ram': laptop.ram,
+            'storage': getattr(laptop, 'storage', ''),
+            'gpu': getattr(laptop, 'gpu', ''),
+            'price': laptop.price,
+            'specs': laptop.specs,
+            'stock_status': getattr(laptop, 'stock_status', 'in-stock'),
+            'image': getattr(laptop, 'image', None)
+        })
+    
+    return render_template('seller_dashboard.html', laptops=my_laptops, laptops_json=serialized_laptops, count=len(my_laptops))
 
 @app.route('/student_dashboard', methods=['GET', 'POST'])
 @login_required

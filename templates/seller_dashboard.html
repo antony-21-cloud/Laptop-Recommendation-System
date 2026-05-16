@@ -16,48 +16,260 @@
     </div>
 
     <!-- ==================== HOME/PROFILE TAB ==================== -->
-    <div id="tab-home" class="tab-content">
-        <div class="bg-black border border-gray-800 rounded-xl p-8 max-w-5xl mx-auto">
-            <div class="flex justify-between items-center mb-6 pb-3 border-b border-gray-800">
-                <h3 class="text-2xl font-bold text-white">Seller Business Profile</h3>
-                <button onclick="toggleEditMode()" id="edit-toggle-btn" class="bg-white text-black px-5 py-2 rounded-lg text-sm font-bold hover:bg-blue-600 hover:text-white transition-all">
-                    <i class="fas fa-edit mr-2"></i> Edit Profile
-                </button>
+<div id="tab-home" class="tab-content">
+    <!-- Welcome Banner -->
+    <div class="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-2xl p-8 mb-8 border border-blue-500/30">
+        <div class="flex justify-between items-center flex-wrap gap-4">
+            <div>
+                <h2 class="text-3xl font-bold text-white mb-2">
+                    Welcome back, <span class="text-blue-400">{{ current_user.username }}</span>!
+                </h2>
+                <p class="text-gray-400 text-lg">Manage your laptop business and connect with customers 🚀</p>
             </div>
-            
-            <div id="profile-view-mode">
-                <div class="grid grid-cols-2 gap-6">
-                    <div><p class="text-gray-500 text-sm mb-1">Business Name:</p><p class="text-white text-lg" id="view-business-name">{{ current_user.business_name or 'Not set' }}</p></div>
-                    <div><p class="text-gray-500 text-sm mb-1">Registration Number:</p><p class="text-white text-lg" id="view-reg-number">{{ current_user.registration_number or 'Not set' }}</p></div>
-                    <div><p class="text-gray-500 text-sm mb-1">Owner Name:</p><p class="text-white text-lg">{{ current_user.username }}</p></div>
-                    <div><p class="text-gray-500 text-sm mb-1">Email:</p><p class="text-white text-lg" id="view-email">{{ current_user.email or 'Not set' }}</p></div>
-                    <div><p class="text-gray-500 text-sm mb-1">Phone:</p><p class="text-white text-lg" id="view-phone">{{ current_user.phone or 'Not set' }}</p></div>
-                    <div><p class="text-gray-500 text-sm mb-1">Business Type:</p><p class="text-white text-lg" id="view-business-type">{{ current_user.business_type or 'Not set' }}</p></div>
-                    <div class="col-span-2"><p class="text-gray-500 text-sm mb-1">Address:</p><p class="text-white text-lg" id="view-address">{{ current_user.address or 'Not set' }}</p></div>
-                    <div class="col-span-2"><p class="text-gray-500 text-sm mb-1">Warranty Info:</p><p class="text-white text-lg" id="view-warranty">{{ current_user.warranty_info or 'Not set' }}</p></div>
+            <div class="text-right">
+                <p class="text-gray-500 text-sm">Today is</p>
+                <p class="text-white font-semibold" id="current-date"></p>
+            </div>
+        </div>
+        
+        <!-- Quick Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+            <div class="bg-black/50 rounded-xl p-4 border border-gray-700 hover:border-blue-500 transition-all">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-laptop text-2xl text-blue-400"></i>
+                    <div>
+                        <p class="text-gray-500 text-sm">My Listings</p>
+                        <p class="text-white text-xl font-bold" id="my-listings-count">{{ laptops|length }}</p>
+                    </div>
                 </div>
             </div>
-
-            <div id="profile-edit-mode" class="hidden">
-                <form id="profile-edit-form">
-                    <div class="grid grid-cols-2 gap-6">
-                        <div><label class="text-gray-400 text-sm mb-2 block">Business Name *</label><input type="text" id="edit-business-name" value="{{ current_user.business_name or '' }}" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white"></div>
-                        <div><label class="text-gray-400 text-sm mb-2 block">Registration Number</label><input type="text" id="edit-reg-number" value="{{ current_user.registration_number or '' }}" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white"></div>
-                        <div><label class="text-gray-400 text-sm mb-2 block">Email *</label><input type="email" id="edit-email" value="{{ current_user.email or '' }}" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white"></div>
-                        <div><label class="text-gray-400 text-sm mb-2 block">Phone *</label><input type="tel" id="edit-phone" value="{{ current_user.phone or '' }}" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white"></div>
-                        <div><label class="text-gray-400 text-sm mb-2 block">Business Type</label><select id="edit-business-type" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white"><option value="">Select</option><option value="Individual Seller">Individual Seller</option><option value="Registered Company">Registered Company</option><option value="Retail Store">Retail Store</option></select></div>
-                        <div><label class="text-gray-400 text-sm mb-2 block">Member Since</label><p class="text-gray-500 p-3 bg-gray-900 rounded-lg">{{ current_user.created_at.strftime('%B %d, %Y') if current_user.created_at else 'N/A' }}</p></div>
-                        <div class="col-span-2"><label class="text-gray-400 text-sm mb-2 block">Address</label><input type="text" id="edit-address" value="{{ current_user.address or '' }}" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white"></div>
-                        <div class="col-span-2"><label class="text-gray-400 text-sm mb-2 block">Warranty Info</label><textarea id="edit-warranty" rows="2" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white">{{ current_user.warranty_info or '' }}</textarea></div>
+            <div class="bg-black/50 rounded-xl p-4 border border-gray-700 hover:border-green-500 transition-all">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-check-circle text-2xl text-green-400"></i>
+                    <div>
+                        <p class="text-gray-500 text-sm">In Stock</p>
+                        <p class="text-white text-xl font-bold" id="in-stock-count">0</p>
                     </div>
-                    <div class="flex gap-4 mt-6">
-                        <button type="submit" class="bg-white text-black px-6 py-2 rounded-lg font-bold hover:bg-blue-600 hover:text-white transition-all"><i class="fas fa-save mr-2"></i> Save Changes</button>
-                        <button type="button" onclick="cancelEdit()" class="bg-gray-800 text-white px-6 py-2 rounded-lg font-bold hover:bg-gray-700 transition-all"><i class="fas fa-times mr-2"></i> Cancel</button>
+                </div>
+            </div>
+            <div class="bg-black/50 rounded-xl p-4 border border-gray-700 hover:border-yellow-500 transition-all">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-envelope text-2xl text-yellow-400"></i>
+                    <div>
+                        <p class="text-gray-500 text-sm">Total Inquiries</p>
+                        <p class="text-white text-xl font-bold" id="total-inquiries-count">0</p>
                     </div>
-                </form>
+                </div>
+            </div>
+            <div class="bg-black/50 rounded-xl p-4 border border-gray-700 hover:border-red-500 transition-all">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-clock text-2xl text-red-400"></i>
+                    <div>
+                        <p class="text-gray-500 text-sm">Pending Replies</p>
+                        <p class="text-white text-xl font-bold" id="pending-replies-count">0</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Business Profile Section -->
+    <div class="bg-black border border-gray-800 rounded-2xl overflow-hidden">
+        <div class="bg-gradient-to-r from-gray-900 to-black px-6 py-4 border-b border-gray-800 flex justify-between items-center flex-wrap gap-3">
+            <div>
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fas fa-store text-blue-400 text-2xl"></i> Business Profile
+                </h3>
+                <p class="text-gray-500 text-sm mt-1">Manage your business information and contact details</p>
+            </div>
+            <button onclick="toggleSellerEditMode()" id="edit-seller-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2">
+                <i class="fas fa-edit"></i> Edit Profile
+            </button>
+        </div>
+        
+        <!-- View Mode -->
+        <div id="seller-profile-view-mode" class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Left Column -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3 pb-2 border-b border-gray-800">
+                        <i class="fas fa-building text-blue-400 w-5"></i>
+                        <div>
+                            <p class="text-gray-500 text-xs">Business Name</p>
+                            <p class="text-white font-medium" id="view-business-name">{{ current_user.business_name or 'Not set' }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 pb-2 border-b border-gray-800">
+                        <i class="fas fa-id-card text-blue-400 w-5"></i>
+                        <div>
+                            <p class="text-gray-500 text-xs">Registration Number</p>
+                            <p class="text-white font-medium" id="view-reg-number">{{ current_user.registration_number or 'Not set' }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 pb-2 border-b border-gray-800">
+                        <i class="fas fa-user-tie text-blue-400 w-5"></i>
+                        <div>
+                            <p class="text-gray-500 text-xs">Owner Name</p>
+                            <p class="text-white font-medium">{{ current_user.username }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 pb-2 border-b border-gray-800">
+                        <i class="fas fa-envelope text-blue-400 w-5"></i>
+                        <div>
+                            <p class="text-gray-500 text-xs">Email Address</p>
+                            <p class="text-white font-medium" id="view-email">{{ current_user.email or 'Not set' }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 pb-2 border-b border-gray-800">
+                        <i class="fas fa-phone text-blue-400 w-5"></i>
+                        <div>
+                            <p class="text-gray-500 text-xs">Phone Number</p>
+                            <p class="text-white font-medium" id="view-phone">{{ current_user.phone or 'Not set' }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3 pb-2 border-b border-gray-800">
+                        <i class="fas fa-tag text-blue-400 w-5"></i>
+                        <div>
+                            <p class="text-gray-500 text-xs">Business Type</p>
+                            <p class="text-white font-medium" id="view-business-type">{{ current_user.business_type or 'Not set' }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 pb-2 border-b border-gray-800">
+                        <i class="fas fa-map-marker-alt text-blue-400 w-5"></i>
+                        <div>
+                            <p class="text-gray-500 text-xs">Physical Address</p>
+                            <p class="text-white font-medium" id="view-address">{{ current_user.address or 'Not set' }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 pb-2 border-b border-gray-800">
+                        <i class="fas fa-shield-alt text-blue-400 w-5"></i>
+                        <div>
+                            <p class="text-gray-500 text-xs">Warranty Information</p>
+                            <p class="text-white font-medium" id="view-warranty">{{ current_user.warranty_info or 'Not set' }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 pb-2 border-b border-gray-800">
+                        <i class="fas fa-calendar-alt text-blue-400 w-5"></i>
+                        <div>
+                            <p class="text-gray-500 text-xs">Member Since</p>
+                            <p class="text-white font-medium">{{ current_user.created_at.strftime('%B %d, %Y') if current_user.created_at else 'N/A' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Mode -->
+        <div id="seller-profile-edit-mode" class="hidden p-6">
+            <form id="seller-profile-edit-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Business Name *</label>
+                        <input type="text" id="edit-business-name" value="{{ current_user.business_name or '' }}" placeholder="Your business name" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Registration Number</label>
+                        <input type="text" id="edit-reg-number" value="{{ current_user.registration_number or '' }}" placeholder="KRA PIN / Business Reg No" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Email Address *</label>
+                        <input type="email" id="edit-email" value="{{ current_user.email or '' }}" placeholder="business@email.com" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Phone Number *</label>
+                        <input type="tel" id="edit-phone" value="{{ current_user.phone or '' }}" placeholder="+254 700 000000" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Business Type</label>
+                        <select id="edit-business-type" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:border-blue-500 focus:outline-none">
+                            <option value="">Select Business Type</option>
+                            <option value="Individual Seller" {% if current_user.business_type == 'Individual Seller' %}selected{% endif %}>👤 Individual Seller</option>
+                            <option value="Registered Company" {% if current_user.business_type == 'Registered Company' %}selected{% endif %}>🏢 Registered Company</option>
+                            <option value="Retail Store" {% if current_user.business_type == 'Retail Store' %}selected{% endif %}>🏪 Retail Store</option>
+                            <option value="Online Store" {% if current_user.business_type == 'Online Store' %}selected{% endif %}>🌐 Online Store</option>
+                            <option value="Distributor" {% if current_user.business_type == 'Distributor' %}selected{% endif %}>📦 Distributor</option>
+                            <option value="Electronics Shop" {% if current_user.business_type == 'Electronics Shop' %}selected{% endif %}>📱 Electronics Shop</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Member Since</label>
+                        <p class="text-gray-500 p-3 bg-gray-900 rounded-lg">{{ current_user.created_at.strftime('%B %d, %Y') if current_user.created_at else 'N/A' }}</p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Physical Address</label>
+                        <input type="text" id="edit-address" value="{{ current_user.address or '' }}" placeholder="Street, City, Building, Landmark" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="text-gray-400 text-sm font-bold mb-2 block">Warranty Information</label>
+                        <textarea id="edit-warranty" rows="2" placeholder="e.g., 12 months warranty on all laptops, 30-day return policy, Free technical support for 6 months" class="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:border-blue-500 focus:outline-none">{{ current_user.warranty_info or '' }}</textarea>
+                        <p class="text-gray-500 text-xs mt-1">This information will be visible to customers when they inquire about your laptops</p>
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-6">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold transition-all flex items-center gap-2">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <button type="button" onclick="cancelSellerEdit()" class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-bold transition-all flex items-center gap-2">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Business Tips Section -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+        <div class="bg-gradient-to-r from-blue-900/20 to-black rounded-xl p-5 border border-blue-500/20 hover:border-blue-500/50 transition-all">
+            <div class="flex items-center gap-3 mb-3">
+                <i class="fas fa-chart-line text-blue-400 text-xl"></i>
+                <h4 class="text-white font-bold">Seller Tip #1</h4>
+            </div>
+            <p class="text-gray-400 text-sm">Add high-quality images of your laptops to attract more customers and increase inquiry rates!</p>
+        </div>
+        <div class="bg-gradient-to-r from-green-900/20 to-black rounded-xl p-5 border border-green-500/20 hover:border-green-500/50 transition-all">
+            <div class="flex items-center gap-3 mb-3">
+                <i class="fas fa-reply-all text-green-400 text-xl"></i>
+                <h4 class="text-white font-bold">Seller Tip #2</h4>
+            </div>
+            <p class="text-gray-400 text-sm">Respond to customer inquiries promptly. Fast responses build trust and increase sales!</p>
+        </div>
+        <div class="bg-gradient-to-r from-yellow-900/20 to-black rounded-xl p-5 border border-yellow-500/20 hover:border-yellow-500/50 transition-all">
+            <div class="flex items-center gap-3 mb-3">
+                <i class="fas fa-tags text-yellow-400 text-xl"></i>
+                <h4 class="text-white font-bold">Seller Tip #3</h4>
+            </div>
+            <p class="text-gray-400 text-sm">Keep your stock status updated. Mark laptops as "Out of Stock" when sold to avoid confusion!</p>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="mt-8">
+        <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+            <i class="fas fa-bolt text-yellow-400"></i> Quick Actions
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button onclick="dashboardShowTab('uploads')" class="bg-gray-900 hover:bg-blue-600 border border-gray-700 hover:border-blue-500 rounded-xl p-4 text-left transition-all group">
+                <i class="fas fa-plus-circle text-blue-400 text-xl mb-2 group-hover:scale-110 transition-transform"></i>
+                <p class="text-white font-semibold">Add New Laptop</p>
+                <p class="text-gray-500 text-sm">Upload a new laptop listing</p>
+            </button>
+            <button onclick="dashboardShowTab('inquiries')" class="bg-gray-900 hover:bg-blue-600 border border-gray-700 hover:border-blue-500 rounded-xl p-4 text-left transition-all group">
+                <i class="fas fa-envelope text-green-400 text-xl mb-2 group-hover:scale-110 transition-transform"></i>
+                <p class="text-white font-semibold">View Inquiries</p>
+                <p class="text-gray-500 text-sm">Check and respond to customer messages</p>
+            </button>
+            <button onclick="dashboardShowTab('uploads')" class="bg-gray-900 hover:bg-blue-600 border border-gray-700 hover:border-blue-500 rounded-xl p-4 text-left transition-all group">
+                <i class="fas fa-chart-simple text-purple-400 text-xl mb-2 group-hover:scale-110 transition-transform"></i>
+                <p class="text-white font-semibold">Manage Inventory</p>
+                <p class="text-gray-500 text-sm">Update stock status and prices</p>
+            </button>
+        </div>
+    </div>
+</div>
 
     <!-- ==================== UPLOADS TAB ==================== -->
     <div id="tab-uploads" class="tab-content hidden">
@@ -508,6 +720,115 @@
         });
     }
     
+// ==================== SELLER PROFILE EDITING ====================
+function toggleSellerEditMode() {
+    var viewMode = document.getElementById('seller-profile-view-mode');
+    var editMode = document.getElementById('seller-profile-edit-mode');
+    var editBtn = document.getElementById('edit-seller-btn');
+    
+    if (viewMode.classList.contains('hidden')) {
+        viewMode.classList.remove('hidden');
+        editMode.classList.add('hidden');
+        editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit Profile';
+        editBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+        editBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+    } else {
+        viewMode.classList.add('hidden');
+        editMode.classList.remove('hidden');
+        editBtn.innerHTML = '<i class="fas fa-eye"></i> View Profile';
+        editBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+        editBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+    }
+}
+
+function cancelSellerEdit() {
+    location.reload();
+}
+
+// Seller profile form submission
+var sellerProfileForm = document.getElementById('seller-profile-edit-form');
+if (sellerProfileForm) {
+    sellerProfileForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        var formData = {
+            business_name: document.getElementById('edit-business-name').value,
+            registration_number: document.getElementById('edit-reg-number').value,
+            email: document.getElementById('edit-email').value,
+            phone: document.getElementById('edit-phone').value,
+            business_type: document.getElementById('edit-business-type').value,
+            address: document.getElementById('edit-address').value,
+            warranty_info: document.getElementById('edit-warranty').value
+        };
+        
+        try {
+            var response = await fetch('/api/update-seller-profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+            
+            if (response.ok) {
+                alert('Business profile updated successfully!');
+                location.reload();
+            } else {
+                alert('Error updating profile');
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            alert('Network error. Please try again.');
+        }
+    });
+}
+
+// ==================== SELLER HOME TAB STATS ====================
+async function loadSellerHomeStats() {
+    try {
+        // Count in-stock laptops
+        var inStockCount = 0;
+        var laptopRows = document.querySelectorAll('#laptops-table-body tr');
+        if (laptopRows.length > 0) {
+            // This will be populated from the existing laptop data
+            //var laptops = {{ laptops_json|tojson|safe }};
+            inStockCount = laptops.filter(function(l) { return l.stock_status === 'in-stock'; }).length;
+        }
+        document.getElementById('in-stock-count').textContent = inStockCount;
+        
+        // Load inquiries count
+        var inquiriesResponse = await fetch('/api/seller-requests/' + currentSellerId);
+        var inquiries = await inquiriesResponse.json();
+        document.getElementById('total-inquiries-count').textContent = inquiries.length;
+        
+        // Count pending replies (inquiries without seller_reply)
+        var pendingReplies = inquiries.filter(function(req) {
+            return !req.seller_reply;
+        }).length;
+        document.getElementById('pending-replies-count').textContent = pendingReplies;
+        
+    } catch(err) {
+        console.error('Error loading seller stats:', err);
+    }
+}
+
+// Display current date
+function displaySellerDate() {
+    var dateElement = document.getElementById('current-date');
+    if (dateElement) {
+        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        var today = new Date().toLocaleDateString('en-US', options);
+        dateElement.textContent = today;
+    }
+}
+
+// Update the DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Seller dashboard loaded");
+    window.dashboardShowTab('home');
+    loadSellerInquiries();
+    loadSellerHomeStats();
+    displaySellerDate();
+});
+
     // ==================== LOAD SELLER INQUIRIES ====================
     async function loadSellerInquiries() {
         console.log("Loading seller inquiries...");
